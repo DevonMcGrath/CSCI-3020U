@@ -1,8 +1,3 @@
-/*
-- The program does not need to do anything else, ensure that you free your
-memory before terminating.
-- You will need to review the malloc, calloc, and sizeof documentation.
-*/
 
 #include <stdlib.h>
 #include <stdio.h>
