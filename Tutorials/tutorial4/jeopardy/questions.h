@@ -25,7 +25,7 @@ static char categories[NUM_CATEGORIES][MAX_LEN] = {
 
 // Questions struct for each question
 typedef struct {
-    char category[MAX_LEN];
+    int category;
     char question[MAX_LEN];
     char answer[MAX_LEN];
     int value;
@@ -36,6 +36,13 @@ typedef struct {
 // this may need to be a pointer if you want it set dynamically
 question questions[NUM_QUESTIONS];
 
+// Posts text to the terminal on a specific line and column
+// with a specified colour
+void post(int line, int col, const char *text, int colour_code);
+
+// Clears the terminal
+void clear_terminal();
+
 // Initializes the array of questions for the game
 extern void initialize_game(void);
 
@@ -43,12 +50,18 @@ extern void initialize_game(void);
 extern void display_categories(void);
 
 // Displays the question for the category and dollar value
-extern void display_question(char *category, int value);
+extern void display_question(int category, int value);
 
 // Returns true if the answer is correct for the question for that category and dollar value
-extern bool valid_answer(char *category, int value, char *answer);
+extern bool valid_answer(int category, int value, char *answer);
 
 // Returns true if the question has already been answered
-extern bool already_answered(char *category, int value);
+extern bool already_answered(int category, int value);
+
+// Returns the index of the question or -1 if it doesn't exist
+extern int get_question_index(int category, int value);
+
+// Returns the index of the category or -1 if it doesn't exist
+extern int get_category_index(const char *category);
 
 #endif /* QUESTIONS_H_ */

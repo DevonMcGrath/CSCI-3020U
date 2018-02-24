@@ -28,9 +28,7 @@ void show_results(struct player *players, int num_players);
 
 int game_state;
 
-
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     // An array of 4 players, may need to be a pointer if you want it set dynamically
     struct player players[NUM_PLAYERS];
 
@@ -41,7 +39,7 @@ int main(int argc, char *argv[])
     // Display the game introduction and initialize the questions
     initialize_game();
 
-    for (int i =0;i<NUM_PLAYERS;i++){
+    for (int i =0; i < NUM_PLAYERS; i++) {
         printf("Enter player %d name\n",i);
         fgets(input, BUFFER_LEN, stdin);
         strtok(input,"\n");
@@ -49,96 +47,92 @@ int main(int argc, char *argv[])
         players[i].score=0;
     }
 
-    int i=0;
+    int i = 0;
 
     // Perform an infinite loop getting command input from users until game ends
     game_state = 1;
-    while (game_state)
-    {
+    while (game_state) {
       int dollars;
       char category[BUFFER_LEN];
 
         //new player turn
-        int current_player = i%NUM_PLAYERS;
-        printf("Players %s turn\n",players[current_player].name);
+        int current_player = i % NUM_PLAYERS;
+        printf("Players %s turn\n", players[current_player].name);
 
         //get input for catergory and dollar amount
 
         //this loop is a safety precaution incase input is incorrect
         bool catergory_input_invalid = true;
-        while(catergory_input_invalid){
-          printf("Enter category name and dollar ammount\n");
-          fgets(input, BUFFER_LEN, stdin);
+        int cat_index = -1;
+        while (catergory_input_invalid) {
           display_categories();
+          fgets(input, BUFFER_LEN, stdin);
           char** tokens = (char**)malloc(sizeof(char*) * BUFFER_LEN); // 100 'char*'
 
           tokenize(input,tokens);
 
-          int token_cnt=0;
-          for (int i=0; tokens[i]!= NULL;i++){
-              token_cnt+=1;
+          int token_cnt = 0;
+          for (int i = 0; tokens[i] != NULL; i++) {
+              token_cnt += 1;
           }
           //makes sure a catergory and a question is asked
-          if (token_cnt!=2){
+          if (token_cnt != 2) {
             printf("ERROR: Please enter a catergory and a number\n");
-          }else{
+            continue;
+          }
 
-            //make sure that the dollar is an integer
-            //TODO use regex to remove $signs
-            strcpy(category,tokens[0]);
-            dollars = atoi(tokens[1]);
-            printf("catergory %s, dollars %d \n",category,dollars);
+          //make sure that the dollar is an integer
+          //TODO use regex to remove $signs
+          strcpy(category,tokens[0]);
+          dollars = atoi(tokens[1]);
+          printf("catergory %s, dollars %d \n", category, dollars);
+          cat_index = get_category_index(category);
 
-            if(dollars!= 0 ){
-              catergory_input_invalid=false;
-              display_question(category, dollars);
-            }else{
-              printf("ERROR: Please enter a catergory and a number\n");
-            }
+          if (cat_index >= 0 && dollars != 0 && !already_answered(cat_index, dollars)) {
+            catergory_input_invalid = false;
+            display_question(cat_index, dollars);
+          } else {
+            printf("ERROR: Please enter a catergory and a number\n");
           }
         }
 
-
-        printf("Enter Answer\n");
         fgets(input, BUFFER_LEN, stdin);
         char** answer_tokens = (char**)malloc(sizeof(char*) * BUFFER_LEN); // 100 'char*'
         tokenize(input,answer_tokens);
 
-        int token_cnt=0;
-        for (int i=0; answer_tokens[i]!= NULL;i++){
-            token_cnt+=1;
+        int token_cnt = 0;
+        for (int i = 0; answer_tokens[i] != NULL; i++){
+            token_cnt += 1;
         }
 
         //make sure that "who is" and "what is" are ignored
-        if (token_cnt<3){
+        if (token_cnt < 3) {
           printf("Incorrect!\n");
 
-        }else{
+        } else {
           //make sure that the first to tokens follow
           //the Jeporady format
-          if((strcmp(answer_tokens[0],"Who") ||
-          strcmp(answer_tokens[0],"What")) && strcmp(answer_tokens[1],"is")){
-            char answer[BUFFER_LEN];
+          if (answer_tokens[0][0] == 'w') {
+              answer_tokens[0][0] = 'W';
+          }
+          if ((strcmp(answer_tokens[0],"Who") == 0 ||
+          strcmp(answer_tokens[0],"What") == 0)
+          && strcmp(answer_tokens[1],"is") == 0){
+            char answer[BUFFER_LEN] = "";
 
             //create a string that has the answer
-            for (int i=2; answer_tokens[i]!= NULL;i++){
-              strcat(answer," ");
+            for (int i = 2; answer_tokens[i] != NULL; i++) {
+              if (i != 2) { strcat(answer," "); }
               strcat(answer,answer_tokens[i]);
             }
 
-            //test if the answer has already been ansered
-            if (already_answered(category, dollars)){
-                  printf("Already Answered Please try again\n");
-                  i--;
-                  continue;
-            }else{
-                //answer is valid
-                if (valid_answer(category,dollars,answer)){
-                   printf("Correct!\n");
-                   players[current_player].score+=dollars;
-                }else{
-                   printf("Incorrect!\n");
-                }
+            //answer is valid
+            if (valid_answer(cat_index, dollars, answer)) {
+                printf("Correct!\n");
+                players[current_player].score += dollars;
+                questions[get_question_index(cat_index, dollars)].answered = true;
+            } else {
+                printf("Incorrect!\n");
             }
           }else{
             printf("Incorrect!\n");
