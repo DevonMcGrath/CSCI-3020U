@@ -11,7 +11,7 @@
 #include "questions.h"
 
 enum colour { black = 30, red, green, brown, blue, purple, cyan, grey };
-  
+
 // Posts text to the terminal on a specific line and column
 // with a specified colour
 void post(int line, int col, const char *text, int colour_code){
@@ -135,7 +135,7 @@ void display_question(int category, int value) {
 	question q = questions[index];
 	char line[MAX_LEN];
 	sprintf(line, "Category: %s\tValue: $%d", categories[q.category],
-		value); 
+		value);
 	post(1, 1, line, green);
 	post(3, 5, q.question, cyan);
 	post(5, 10, "Answer: ", purple);
