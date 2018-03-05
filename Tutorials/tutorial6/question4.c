@@ -24,7 +24,7 @@ void* producer(void* arg){
       sleep(sleep_len);
     }    //wake up consumer
       sem_post(&sem);
-      printf("i: %d\n",i );
+
   }
   return 0;
 }
