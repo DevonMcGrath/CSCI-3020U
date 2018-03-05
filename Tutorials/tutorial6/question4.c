@@ -12,17 +12,19 @@ sem_t sem;
 //add to buffer_len
 void* producer(void* arg){
   int* arr = (int*)arg;
-  for (int i =0; i< NUMBERS;i++){
+  int produced_cnt =0;
+  while(produced_cnt<NUMBERS){
     //if too large wait for the consumer
     sem_wait(&sem);
     if(buffer_len<5){
-      buffer[i] = arr[i];
+      buffer[buffer_len] = arr[produced_cnt];
+      printf("Produced %d\n",buffer[buffer_len]);
       buffer_len++;
-      printf("Produced %d\n",buffer[i]);
 
       int sleep_len = rand() % 3;
       sleep(sleep_len);
-    }    //wake up consumer
+      produced_cnt++;
+    }
       sem_post(&sem);
 
   }
@@ -34,16 +36,16 @@ void* consumer(void* arg){
   while(consumed_cnt<NUMBERS){
     sem_wait(&sem);
     //wait and allow producer to go
-    if(buffer_len>=0){
-      printf("Consumed: %d\n", buffer[buffer_len]);
+    if(buffer_len>0){
+      printf("Consumed: %d\n", buffer[buffer_len-1]);
       buffer[buffer_len]=0;
       buffer_len--;
+      consumed_cnt++;
 
       int sleep_len = rand() % 3;
 
     sleep(sleep_len) ;
-      consumed_cnt++;
-    }
+  }
     sem_post(&sem);
   }
   return 0;
