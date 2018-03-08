@@ -40,13 +40,12 @@ void push(proc_t* process){
 
 //remove first element in linked list
 proc_t* pop(){
-  proc_t* retval = NULL;
-     queue_t* next_node = NULL;
+    proc_t* retval =  malloc(sizeof(proc_t));
+    queue_t* next_node = NULL;
 
      if (linked_list == NULL) {
          return NULL;
      }
-
      next_node = linked_list->next;
      *retval = linked_list->process;
      linked_list= next_node;
@@ -55,41 +54,45 @@ proc_t* pop(){
 
 proc_t* delete_name(char* name){
   queue_t* current = linked_list;
+  proc_t* return_proc = malloc(sizeof(proc_t));
+  if(current==NULL){
+    return NULL;
+  }
 
   while (current->next != NULL) {
       if(strcmp(current->next->process.name,name)==0){
-        proc_t tmp= current->next->process;
-        free(current->next);
+        *return_proc = current->next->process;
+        //go two ahead
         current->next = current->next->next;
-        return &tmp;
+        return return_proc;
       }
-      current = current->next;
+      current=current->next;
   }
   return NULL;
 
 }
 proc_t* delete_pid(int pid){
   queue_t* current = linked_list;
+  proc_t* return_proc = malloc(sizeof(proc_t));
+  if(current==NULL){
+    return NULL;
+  }
 
   while (current->next != NULL) {
       if(current->next->process.pid==pid){
-        proc_t tmp= current->next->process;
-        free(current->next);
+        *return_proc = current->next->process;
+        //go two ahead
         current->next = current->next->next;
-        return &tmp;
-
+        return return_proc;
       }
-      current = current->next;
+      current=current->next;
   }
   return NULL;
 }
 
-
-
-
 void print_all(){
   queue_t * current = linked_list;
-   while (current != NULL) {
+   while (current->next != NULL) {
      printf("name: %s \n",current->process.name);
      printf("priority: %d \n",current->process.priority);
      printf("pid: %d \n",current->process.pid);
@@ -99,8 +102,6 @@ void print_all(){
    }
    /* now we can add a new variable */
 }
-
-
 
 int main(void){
   linked_list = malloc(sizeof(queue_t));
@@ -140,12 +141,15 @@ int main(void){
   }
   fclose(fp);
   print_all();
-  printf("try to pop\n");
-
   proc_t* poped = pop();
   printf("poped name: %s\n",poped->name);
 
+  printf("try to delete_pid:\n");
+  proc_t*deleted=delete_pid(9223);
+  printf("delete_pid: %s\n",deleted->name);
 
+  poped=delete_name("eclipse");
+  printf("delete_pid: %s\n",poped->name);
 
-
+  print_all();
 }
