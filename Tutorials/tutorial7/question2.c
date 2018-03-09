@@ -140,16 +140,19 @@ int main(void){
     push(new_proc);
   }
   fclose(fp);
-  print_all();
-  proc_t* poped = pop();
-  printf("poped name: %s\n",poped->name);
 
-  printf("try to delete_pid:\n");
-  proc_t*deleted=delete_pid(9223);
-  printf("delete_pid: %s\n",deleted->name);
+  delete_name("emacs");
+  delete_pid(12345);
+  queue_t * current = linked_list;
 
-  poped=delete_name("eclipse");
-  printf("delete_pid: %s\n",poped->name);
+  while(current->next!=NULL){
+    proc_t* poped = pop();
+    printf("poped name: %s\n",poped->name);
+    printf("poped priority: %d\n",poped->priority);
+    printf("poped pid: %d\n",poped->pid);
+    printf("poped runtime: %d\n\n",poped->runtime);
 
-  print_all();
+    current=current->next;
+
+  }
 }
