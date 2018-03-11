@@ -25,8 +25,6 @@ typedef struct queue{
 
 queue_t* linked_list;
 
-
-
 //push to end of the queue
 void push(proc_t* process){
   queue_t* current = linked_list;
@@ -38,10 +36,7 @@ void push(proc_t* process){
   current->next = malloc(sizeof(queue_t));
   current->process = *process;
   current->next->next = NULL;
-  printf("added: %s\n",  current->process.name);
 }
-
-//remove first element in linked list
 proc_t* pop(){
     proc_t* retval =  malloc(sizeof(proc_t));
     queue_t* next_node = NULL;
@@ -54,13 +49,22 @@ proc_t* pop(){
      linked_list= next_node;
      return retval;
 }
-
 proc_t* delete_name(char* name){
   queue_t* current = linked_list;
   proc_t* return_proc = malloc(sizeof(proc_t));
   if(current==NULL){
     return NULL;
   }
+
+  if(strcmp(current->process.name,name)==0){
+    *return_proc = current->process;
+    //go two ahead
+    linked_list = current->next;
+    return return_proc;
+  }
+
+
+
 
   while (current->next != NULL) {
       if(strcmp(current->next->process.name,name)==0){
@@ -79,6 +83,13 @@ proc_t* delete_pid(int pid){
   proc_t* return_proc = malloc(sizeof(proc_t));
   if(current==NULL){
     return NULL;
+  }
+
+  if(strcmp(current->process.pid,pid)==0){
+    *return_proc = current->process;
+    //go two ahead
+    linked_list = current->next;
+    return return_proc;
   }
 
   while (current->next != NULL) {
@@ -106,11 +117,22 @@ void print_all(){
    /* now we can add a new variable */
 }
 
-int main(void){
+int main (int argc, char *argv[]){
   linked_list = malloc(sizeof(queue_t));
   linked_list->next=NULL;
 
-  FILE* fp = fopen("processes.txt","r");
+  if(argc!=2){
+    printf("%s\n","please pass in a process as an argument");
+    return 0;
+  }
+  char SHELL[1024];
+  getcwd(SHELL, sizeof(SHELL));
+
+  char* command = argv[1];
+  strcat(SHELL,"/");
+  strcat(SHELL,command);
+
+  FILE* fp = fopen("processes_q5.txt","r");
   while(1){
     proc_t* new_proc= malloc(sizeof(proc_t));
     char* token;
@@ -130,13 +152,9 @@ int main(void){
       free(new_proc);
       break;
     }
-
     sscanf(token,"%d",&new_proc->priority);
-    //get proc pid
-    token= strtok(NULL," ,");
 
-    sscanf(token,"%d",&new_proc->pid);
-    //get proc nuntime
+    new_proc->pid=0;
     token= strtok(NULL," ,");
     sscanf(token,"%d",&new_proc->runtime);
 
@@ -144,18 +162,51 @@ int main(void){
   }
   fclose(fp);
 
-  delete_name("emacs");
-  delete_pid(12345);
   queue_t * current = linked_list;
 
   while(current->next!=NULL){
-    proc_t* poped = pop();
-    printf("poped name: %s\n",poped->name);
-    printf("poped priority: %d\n",poped->priority);
-    printf("poped pid: %d\n",poped->pid);
-    printf("poped runtime: %d\n\n",poped->runtime);
+
+    if(current->process.priority==0){
+      proc_t* deleted_proc = delete_name(current->process.name);
+      pid_t pid = fork();
+      if (pid == 0){
+        execl (SHELL,command, NULL);
+      }else{
+        sleep(deleted_proc->runtime);
+        kill (pid, SIGINT);
+        waitpid (pid, &deleted_proc->pid, 0);
+        printf("deleted\n");
+        printf("name: %s \n",deleted_proc->name);
+        printf("priority: %d \n",deleted_proc->priority);
+        printf("pid: %d \n",deleted_proc->pid);
+        printf("runtime: %d \n",deleted_proc->runtime);
+        //kill the child
+      }
+    }
+    current=current->next;
+  }
+
+  current = linked_list;
+  while(current->next!=NULL){
+
+      proc_t* deleted_proc = delete_name(current->process.name);
+      pid_t pid = fork();
+      if (pid == 0){
+        execl (SHELL,command, NULL);
+      }else{
+        sleep(deleted_proc->runtime);
+        kill (pid, SIGINT);
+        waitpid (pid, &deleted_proc->pid, 0);
+        printf("deleted\n");
+        printf("name: %s \n",deleted_proc->name);
+        printf("priority: %d \n",deleted_proc->priority);
+        printf("pid: %d \n",deleted_proc->pid);
+        printf("runtime: %d \n",deleted_proc->runtime);
+        //kill the child
+      }
 
     current=current->next;
-
   }
+
+
 }
