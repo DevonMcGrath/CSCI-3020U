@@ -174,7 +174,8 @@ int main (int argc, char *argv[]){
       }else{
         sleep(deleted_proc->runtime);
         kill (pid, SIGINT);
-        waitpid (pid, &deleted_proc->pid, 0);
+        deleted_proc->pid=pid;
+        waitpid (pid, NULL, 0);
         printf("deleted\n");
         printf("name: %s \n",deleted_proc->name);
         printf("priority: %d \n",deleted_proc->priority);
@@ -188,7 +189,6 @@ int main (int argc, char *argv[]){
 
   current = linked_list;
   while(current->next!=NULL){
-
       proc_t* deleted_proc = delete_name(current->process.name);
       pid_t pid = fork();
       if (pid == 0){
@@ -196,7 +196,8 @@ int main (int argc, char *argv[]){
       }else{
         sleep(deleted_proc->runtime);
         kill (pid, SIGINT);
-        waitpid (pid, &deleted_proc->pid, 0);
+        deleted_proc->pid=pid;
+        waitpid (pid, NULL, 0);
         printf("deleted\n");
         printf("name: %s \n",deleted_proc->name);
         printf("priority: %d \n",deleted_proc->priority);
