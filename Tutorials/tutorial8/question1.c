@@ -92,7 +92,7 @@ void print_node(proc_t* value) {
 //when a node is null go back 1 and check right side
 void recursive_iterate(proc_tree_t* current){
 
-  while (current->left != NULL) {
+    if (current->left != NULL) {
     depth++;
     current= current->left;
     recursive_iterate(current);
@@ -101,7 +101,7 @@ void recursive_iterate(proc_tree_t* current){
 
   print_node(current->process);
 
-  while (current->right != NULL) {
+  if (current->right != NULL) {
     depth++;
     current = current->right;
     recursive_iterate(current);
