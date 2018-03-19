@@ -16,7 +16,7 @@ int main (int argc, char *argv[])
     #ifdef _OPENMP
     omp_set_num_threads(nthreads);
     #endif
-    printf("Testing OpenMP, you should see each thread print...\n");
+
     #pragma omp parallel for reduction(+: x)
     for (int i = 0; i < 100; ++i)
     {
