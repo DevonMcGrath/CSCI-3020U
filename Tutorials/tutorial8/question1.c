@@ -6,6 +6,7 @@
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <string.h>
 #define BUFFER_LEN 256
 
 typedef struct proc {
@@ -27,7 +28,6 @@ proc_tree_t* tree;
 
 //crawl left to right approach
 void add (proc_t* process){
-  int add_priority = process->priority;
   proc_tree_t* current = tree;
 
   if (current->process==NULL){
@@ -37,31 +37,49 @@ void add (proc_t* process){
     current->right = NULL;
     return;
   }
+
+
   while (current->process != NULL) {
     //crawl until a left or right node is null
     //crawl left
-    if(current->process->priority > add_priority ){
+    if(strcmp(current->process->name, process->parent)==0 ){
       if(current->left == NULL){
-        //allocate space
-
         current->left = malloc(sizeof(proc_tree_t));
         current= current->left;
         break;
-      }else{
-        current= current->left;
-      }
-    }else {//move right
-      //allocate space
-      if(current->right == NULL){
-
+      }else if(current->right == NULL){
         current->right = malloc(sizeof(proc_tree_t));
         current= current->right;
         break;
       }else{
-        current= current->right;
+        printf("%s\n","ERROR NO LEAF SPACE");
+        exit(0);
       }
     }
+    else{//names not equal
+      if(strcmp(current->process->name,process->parent)<0){
+        if(current->left == NULL){
+          //allocate space
+          current->left = malloc(sizeof(proc_tree_t));
+          current= current->left;
+          break;
+        }else{
+          current= current->left;
+        }
+      }
+      else {//move right
+        //allocate space
+        if(current->right == NULL){
+          current->right = malloc(sizeof(proc_tree_t));
+          current= current->right;
+          break;
+        }else{
+          current= current->right;
+        }
+    }
   }
+}
+
   //tree node is null
   current->process = malloc(sizeof(proc_t));
   current->process = process;
@@ -92,42 +110,26 @@ void print_node(proc_t* value) {
 //when a node is null go back 1 and check right side
 void recursive_iterate(proc_tree_t* current){
 
-    if (current->left != NULL) {
-    depth++;
-    current= current->left;
-    recursive_iterate(current);
-    depth--;
+  if(current==NULL){
+    return;
   }
-
-  print_node(current->process);
-
-  if (current->right != NULL) {
+  depth++;
+  recursive_iterate(current->left);
+  depth--;
+    print_node(current->process);
     depth++;
-    current = current->right;
-    recursive_iterate(current);
-    depth--;
-  }
+recursive_iterate(current->right);
+depth--;
 
   return;
 }
 
 
-void print_tree(){
-  recursive_iterate(tree);
+void print_tree(proc_tree_t* current){
+  recursive_iterate(current);
 }
 
 
-/*
-Create the necessary functions to interact with your binary tree data
-structure, you will need to add items to your tree and iterate through it.
-Your program then reads the contents of a file called process_tree.txt (7
-LINES), which contains a comma separated list of the parent, name,
-priority, and memory.
-Read the contents of the file and create your binary tree, add the children
-to the parent based on the name of the parent.
-Print the contents of your binary tree (you likely need to use recursion!)
-displaying the contents of each parent, and the children of each parent.
-*/
 
 int main(void){
   tree = malloc(sizeof(proc_tree_t));
@@ -171,6 +173,9 @@ int main(void){
   }
   fclose(fp);
 
-  print_tree();
+  proc_tree_t* current = tree;
+
+  print_tree(current);
+
 
 }
