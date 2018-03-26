@@ -12,7 +12,7 @@ double expensive(int num)
 int main (int argc, char *argv[])
 {
     long double t = omp_get_wtime();
-    int ARRAYSIZE = 100;
+    int ARRAYSIZE = 1000000;
     double x = 0; // Used in the summation
     int thread_num, nthreads = 16;
     #ifdef _OPENMP
