@@ -1,7 +1,7 @@
 
-Tutorials/tutorial4/jeopardy/nbproject/configurations.xml
-Tutorials/tutorial4/jeopardy/nbproject/private/c_standard_headers_indexer.c
-Tutorials/tutorial4/jeopardy/nbproject/private/launcher.properties
-Tutorials/tutorial4/jeopardy/nbproject/private/private.xml
-Tutorials/tutorial4/jeopardy/nbproject/private/cpp_standard_headers_indexer.cpp
-Tutorials/tutorial9/a.exe
+*.o
+*question1
+*question2
+*question3
+*question4
+*question5
