@@ -6,3 +6,5 @@ q2:
 	mpiexec -np ${NP} ./q2
 q3:
 	mpiexec -np ${NP} ./q3
+q4:
+	mpiexec -mp ${NP} ./q4
